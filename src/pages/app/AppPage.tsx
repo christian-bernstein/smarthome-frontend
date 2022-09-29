@@ -69,6 +69,7 @@ import {MobileNavigation} from "../../components/ho/bottomNavigation/MobileNavig
 import {Mobile} from "../../components/logic/Media";
 import {SettingsShard} from "../../shards/settings/SettingsShard";
 import {FirstJoinIntroductionLauncher} from "../../components/ho/firstJoinIntroduction/FirstJoinIntroductionLauncher";
+import {ShiganshinaLauncher} from "../../smarthome-shiganshina/ShiganshinaLauncher";
 
 export type AppPageProps = {
     mode?: AppPageMode
@@ -94,10 +95,6 @@ export function getInstance(): AppPage | undefined {
 }
 
 export class AppPage extends BernieComponent<AppPageProps, AppPageState, any> {
-
-    private readonly DialogTransition = React.forwardRef((props: TransitionProps & {children?: React.ReactElement<any, any>}, ref: ForwardedRef<unknown>) => {
-        return <Slide direction="up" mountOnEnter ref={ref} {...props} />;
-    });
 
     private mounted: boolean = false;
 
@@ -138,7 +135,7 @@ export class AppPage extends BernieComponent<AppPageProps, AppPageState, any> {
                 return;
             case AppPageMode.RELEASE:
                 this.appInit({
-                    appTitle: "SQL Editor",
+                    appTitle: "Shiganshina",
                     debugMode: false,
                     defaultAppRoute: "/boarding",
                     defaultDebugAppRoute: "/boarding",
@@ -429,7 +426,11 @@ export class AppPage extends BernieComponent<AppPageProps, AppPageState, any> {
 
             return (
                 <ThemeProvider theme={theme.muiTheme} children={
+
                     <AF elements={[
+
+                        <ShiganshinaLauncher/>,
+
                         /**
                          * Launchers (Might show content, but not necessarily)
                          */

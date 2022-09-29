@@ -1,4 +1,4 @@
-import ReactCodeMirror, {Extension} from "@uiw/react-codemirror";
+import ReactCodeMirror from "@uiw/react-codemirror";
 import React from "react";
 import _ from "lodash";
 import {getOr} from "../../logic/Utils";
@@ -14,8 +14,8 @@ export type CodeEditorProps = WithVisualMeaning & {
     upstreamHook: (value: string) => void,
     placeholder?: string | HTMLElement,
     classnames?: string[],
-    theme?: "dark" | "light" | Extension,
-    extensions?: Extension[],
+    theme?: "dark" | "light" | any,
+    extensions?: any[],
     debounce?: boolean,
     debounceMS?: number,
     width?: DimensionalMeasured,

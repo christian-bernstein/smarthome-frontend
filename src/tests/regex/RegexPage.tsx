@@ -1,6 +1,6 @@
 import React from "react";
 import {Text, TextType} from "../../components/lo/Text";
-import ReactCodeMirror, {Extension} from "@uiw/react-codemirror";
+import ReactCodeMirror from "@uiw/react-codemirror";
 import styled from "styled-components";
 import {Themeable} from "../../logic/style/Themeable";
 import {utilizeGlobalTheme} from "../../logic/app/App";
@@ -47,8 +47,8 @@ export type CodeEditorProps = {
     upstreamHook: (value: string) => void,
     placeholder?: string | HTMLElement,
     classnames?: string[],
-    theme?: "dark" | "light" | Extension,
-    extensions?: Extension[],
+    theme?: "dark" | "light" | any,
+    extensions?: any[],
     debounce?: boolean,
     debounceMS?: number
 }

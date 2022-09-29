@@ -111,7 +111,7 @@ export type DebugEditorLocalState = {
 export class Editor extends BernieComponent<DebugEditorProps, DebugEditorState, DebugEditorLocalState> {
 
     private readonly DialogTransition = React.forwardRef((props: TransitionProps & {children?: React.ReactElement<any, any>}, ref: ForwardedRef<unknown>) => {
-        return <Slide direction="up" ref={ref} {...props} />;
+        return <Slide direction="up" ref={ref} {...props} children={props.children as JSX.Element}/>;
     });
 
     // noinspection TypeScriptFieldCanBeMadeReadonly

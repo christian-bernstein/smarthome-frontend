@@ -74,7 +74,14 @@ export type DebugEditorLocalState = {
 export class DebugEditor extends React.Component<DebugEditorProps, DebugEditorState> {
 
     private readonly DialogTransition = React.forwardRef((props: TransitionProps & {children?: React.ReactElement<any, any>}, ref: ForwardedRef<unknown>) => {
-        return <Slide direction="up" ref={ref} {...props} />;
+        return (
+            <Slide
+                direction="up"
+                ref={ref}
+                {...props}
+                children={props.children as JSX.Element}
+            />
+        );
     });
 
     private readonly local = cs<DebugEditorLocalState>({
