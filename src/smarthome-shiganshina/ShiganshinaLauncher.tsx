@@ -15,6 +15,9 @@ import {Justify} from "../logic/style/Justify";
 import {percent, px} from "../logic/style/DimensionalMeasured";
 import {Ticker} from "../smarthome-carbon-core/components/Ticker";
 import {array} from "../logic/Utils";
+import {LoadStateGroupDisplay} from "./components/ho/LoadStateGroupDisplay";
+import {Template} from "../smarthome-carbon-core/components/Template";
+import {Image} from "../components/lo/Image";
 
 export class ShiganshinaLauncher extends BernieComponent<any, any, any> {
 
@@ -41,16 +44,27 @@ export class ShiganshinaLauncher extends BernieComponent<any, any, any> {
 
                             // General UI (Loading animation, loading state description)
                             <Flex style={{ position: "absolute", bottom: "calc(100vh / 4)" }} fw gap={px()} align={Align.CENTER} justifyContent={Justify.CENTER} elements={[
-                                <Ticker interval={1e3} baseCounter={1} counterResetThreshold={4} renderer={counter => (
-                                    <Text
-                                        coloredText
-                                        color={Color.ofHex("#ababab")}
-                                        type={TextType.displayDescription}
-                                        text={`Loading ${array('.', counter).join('')}`}
-                                        fontSize={px(16)}
-                                    />
-                                )}/>
-                            ]}/>,
+                                <LoadStateGroupDisplay tasks={[
+                                    {
+                                        title: "Loading",
+                                        description: ["Loading web application. Configuring state & do other tasks"],
+                                        loadPercentage: 50,
+                                        numIndicator: {
+                                            value: 4,
+                                            max: 8
+                                        }
+                                    },
+                                    {
+                                        title: "Downloading settings",
+                                        description: ["Downloading settings from settings server"],
+                                        loadPercentage: 35,
+                                        numIndicator: {
+                                            value: 189,
+                                            max: 201
+                                        }
+                                    }
+                                ]}/>
+                            ]}/>
                         ]}/>
                     }/>
                 }/>
