@@ -1,23 +1,136 @@
 import {BernieComponent} from "../logic/BernieComponent";
-import {Text, TextType} from "../components/lo/Text";
 import {Assembly} from "../logic/assembly/Assembly";
 import {Themeable} from "../logic/style/Themeable";
 import {Screen} from "../components/lo/Page";
 import {Centered} from "../components/lo/PosInCenter";
 import {CarbonAPI} from "../smarthome-carbon-core/api/CarbonAPI";
-import {carbon, ICarbonAPI} from "../smarthome-carbon-core/api/ICarbonAPI";
-import {ShiganshinaLogo} from "./components/lo/ShiganshinaLogo";
+import {carbon, carbonClass, ICarbonAPI} from "../smarthome-carbon-core/api/ICarbonAPI";
 import {AF} from "../components/logic/ArrayFragment";
-import {Color} from "../logic/style/Color";
-import {Flex} from "../components/lo/FlexBox";
-import {Align} from "../logic/style/Align";
-import {Justify} from "../logic/style/Justify";
-import {percent, px} from "../logic/style/DimensionalMeasured";
-import {Ticker} from "../smarthome-carbon-core/components/Ticker";
-import {array} from "../logic/Utils";
 import {LoadStateGroupDisplay} from "./components/ho/LoadStateGroupDisplay";
-import {Template} from "../smarthome-carbon-core/components/Template";
-import {Image} from "../components/lo/Image";
+import {ShiganshinaAPI} from "./api/ShiganshinaAPI";
+import {Flex} from "../components/lo/FlexBox";
+import {Button} from "../components/lo/Button";
+import {Align} from "../logic/style/Align";
+import {LoadTaskStateInfo} from "./api/LoadTaskStateInfo";
+import {LiteGrid} from "../components/lo/LiteGrid";
+import {ShiganshinaLogo} from "./components/lo/ShiganshinaLogo";
+import {percent} from "../logic/style/DimensionalMeasured";
+import {Justify} from "../logic/style/Justify";
+import React, {useEffect, useState} from "react";
+import {Collapse} from "@mui/material";
+import {TransitionGroup} from "react-transition-group";
+import {createMargin} from "../logic/style/Margin";
+import {IShiganshinaAPI, shiganshina} from "./api/IShiganshinaAPI";
+import {LoadStateDisplay} from "./components/ho/LoadStateDisplay";
+
+type LoadDisplayProps = {
+    onFinish?: () => void
+}
+
+class LoadDisplay extends carbonClass<LoadDisplayProps, any, { state?: LoadTaskStateInfo }>() {
+
+    constructor(props: LoadDisplayProps) {
+        super(props, undefined, {});
+    }
+
+    componentDidMount() {
+        super.componentDidMount();
+
+        setTimeout(() => {
+            shiganshina().load({
+                domEntryPoint: this,
+                onStateChanged: state => {
+                    this.local.setStateWithChannels({
+                        state: state
+                    }, ["data"])
+                },
+                onLoadComplete: () => {
+                    this.props.onFinish?.();
+                }
+            });
+        }, 1e3);
+    }
+
+    componentRender(p: unknown, s: unknown, l: { state?: LoadTaskStateInfo }, t: Themeable.Theme, a: Assembly): JSX.Element | undefined {
+        return (
+            this.component(local => {
+                if (local.state.state === undefined) {
+                    return (
+                        <LoadStateGroupDisplay tasks={[{
+                            title: "Booting",
+                            description: ["Preparing Shiganshina-API loading routine"]
+                        }]}/>
+                    );
+                } else {
+                    const taskTree: Array<LoadTaskStateInfo> = [local.state.state];
+                    let curState = local.state.state;
+                    while (curState.subtask !== undefined) {
+                        taskTree.push(curState.subtask);
+                        curState = curState.subtask;
+                    }
+
+                    return (
+                        <LoadStateGroupDisplay tasks={taskTree}/>
+                    )
+                }
+            }, "data")
+        );
+    }
+}
+
+export type DisplayProps = {
+    onFinish?: () => void
+}
+
+const Display: React.FC<DisplayProps> = props => {
+    const [elements, setElements] = useState(["logo"]);
+
+    interface Map {
+        [key: string]: () => JSX.Element
+    }
+
+    const elementRenderer: Map = {
+        "logo": () => (
+            <Flex align={Align.CENTER} justifyContent={Justify.CENTER} elements={[
+                <ShiganshinaLogo raw/>
+            ]}/>
+        ),
+        "progress": () => (
+            <Flex align={Align.CENTER} elements={[
+                <LoadDisplay onFinish={() => {
+                    setTimeout(() => {
+                        setElements(prevState => prevState.filter(elem => elem !== "progress"));
+                        props.onFinish?.();
+                    }, 2e3);
+                }}/>
+            ]}/>
+        )
+    }
+
+    useEffect(() => {
+        setTimeout(() => {
+            setElements(prevState => (
+                [...prevState, "progress"]
+            ))
+        }, 2e3);
+    }, []);
+
+    return (
+        <TransitionGroup>
+            {elements.map((elem, index) => {
+                const renderer: () => JSX.Element = elementRenderer[elem] ?? (() => <></>);
+
+                return (
+                    <Collapse key={elem}>
+                        <Flex align={Align.CENTER} margin={index > 0 ? createMargin(70,  0, 0, 0) : undefined} justifyContent={Justify.CENTER} elements={[
+                            renderer()
+                        ]}/>
+                    </Collapse>
+                );
+            })}
+        </TransitionGroup>
+    );
+}
 
 export class ShiganshinaLauncher extends BernieComponent<any, any, any> {
 
@@ -29,44 +142,26 @@ export class ShiganshinaLauncher extends BernieComponent<any, any, any> {
             create(): ICarbonAPI {
                 return new CarbonAPI();
             }
+        });
+
+        shiganshina({
+            create(): IShiganshinaAPI {
+                return new ShiganshinaAPI();
+            }
         })
 
         setTimeout(() => {
             this.dialog(
-                <span onClick={() => this.closeLocalDialog()} children={
-                    <Screen deactivatePadding style={{ backgroundColor: "black", position: "relative" }} children={
-                        <AF elements={[
-
-                            // Main logo
-                            <Centered fullHeight children={
-                                <ShiganshinaLogo/>
-                            }/>,
-
-                            // General UI (Loading animation, loading state description)
-                            <Flex style={{ position: "absolute", bottom: "calc(100vh / 4)" }} fw gap={px()} align={Align.CENTER} justifyContent={Justify.CENTER} elements={[
-                                <LoadStateGroupDisplay tasks={[
-                                    {
-                                        title: "Loading",
-                                        description: ["Loading web application. Configuring state & do other tasks"],
-                                        loadPercentage: 50,
-                                        numIndicator: {
-                                            value: 4,
-                                            max: 8
-                                        }
-                                    },
-                                    {
-                                        title: "Downloading settings",
-                                        description: ["Downloading settings from settings server"],
-                                        loadPercentage: 35,
-                                        numIndicator: {
-                                            value: 189,
-                                            max: 201
-                                        }
-                                    }
-                                ]}/>
-                            ]}/>
-                        ]}/>
-                    }/>
+                <Screen deactivatePadding style={{ backgroundColor: "black", position: "relative" }} children={
+                    <AF elements={[
+                        <Centered fullHeight children={
+                            <Display onFinish={() => {
+                                setTimeout(() => {
+                                    this.closeLocalDialog();
+                                }, 2e3);
+                            }}/>
+                        }/>
+                    ]}/>
                 }/>
             );
         }, 1.5e3);

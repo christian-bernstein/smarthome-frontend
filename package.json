@@ -2,7 +2,7 @@
   "name": "sql-editor-web",
   "version": "0.1.0",
   "private": true,
-  "homepage": "/",
+  "homepage": "shiganshina/",
   "dependencies": {
     "@codemirror/lang-javascript": "^0.19.4",
     "@codemirror/lang-json": "^0.20.0",
@@ -79,6 +79,7 @@
     "react-swipeable-views": "^0.14.0",
     "react-tiger-transition": "^4.1.2",
     "react-tooltip": "^4.2.21",
+    "react-transition-group": "^4.4.5",
     "rehype-raw": "^6.1.1",
     "rehype-sanitize": "^5.0.1",
     "reshake": "^1.2.4",

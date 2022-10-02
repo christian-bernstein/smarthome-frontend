@@ -436,41 +436,40 @@ export class AppPage extends BernieComponent<AppPageProps, AppPageState, any> {
                          */
                         <FirstJoinIntroductionLauncher/>,
 
-                        /**
-                         * Visible content
-                         */
-                        <BrowserRouter children={
-                            <MenuPage showMenuInitially={false} doubleClickMenuOpen={false} children={
-                                <MenuPageV2 children={
-                                    <FlexBox id={"app-content-wrapper"} gap={px()} style={{backgroundColor: theme.colors.backgroundColor.css()}} height={DimensionalMeasured.of(100, Dimension.vh)} width={percent(100)} children={
-                                        <AF elements={[
-                                            /**
-                                             * Main content
-                                             * TODO: Add element id to flexbox properties
-                                             */
-                                            <FlexBox id={"app-switch-wrapper"} width={percent(100)} style={{flex: "1 1 auto"}} overflowYBehaviour={OverflowBehaviour.SCROLL} children={
-                                                <Switch children={
-                                                    <AF elements={[
-                                                        this.getRouts(),
-                                                        App.app().screenManager.renderRoutes()
-                                                    ]}/>
-                                                }/>
-                                            }/>,
-
-                                            /**
-                                             * Bottom navigation menu
-                                             * TODO: Only show on mobile devices
-                                             */
-                                            <Mobile children={
-                                                <FlexBox id={"app-mobile-navigation-wrapper"} padding={false} width={percent(100)} style={{flex: "0 1 auto", backgroundColor: theme.colors.backgroundHighlightColor.css()}} children={
-                                                    <MobileNavigation/>
-                                                }/>
-                                            }/>
-                                        ]}/>
-                                    }/>
-                                }/>
-                            }/>
-                        }/>
+                        // /**
+                        //  * Visible content
+                        //  */
+                        // <BrowserRouter children={
+                        //     <MenuPage showMenuInitially={false} doubleClickMenuOpen={false} children={
+                        //         <MenuPageV2 children={
+                        //             <FlexBox id={"app-content-wrapper"} gap={px()} style={{backgroundColor: theme.colors.backgroundColor.css()}} height={DimensionalMeasured.of(100, Dimension.vh)} width={percent(100)} children={
+                        //                 <AF elements={[
+                        //                     /**
+                        //                      * Main content
+                        //                      * TODO: Add element id to flexbox properties
+                        //                      */
+                        //                     <FlexBox id={"app-switch-wrapper"} width={percent(100)} style={{flex: "1 1 auto"}} overflowYBehaviour={OverflowBehaviour.SCROLL} children={
+                        //                         <Switch children={
+                        //                             <AF elements={[
+                        //                                 this.getRouts(),
+                        //                                 App.app().screenManager.renderRoutes()
+                        //                             ]}/>
+                        //                         }/>
+                        //                     }/>,
+                        //                     /**
+                        //                      * Bottom navigation menu
+                        //                      * TODO: Only show on mobile devices
+                        //                      */
+                        //                     <Mobile children={
+                        //                         <FlexBox id={"app-mobile-navigation-wrapper"} padding={false} width={percent(100)} style={{flex: "0 1 auto", backgroundColor: theme.colors.backgroundHighlightColor.css()}} children={
+                        //                             <MobileNavigation/>
+                        //                         }/>
+                        //                     }/>
+                        //                 ]}/>
+                        //             }/>
+                        //         }/>
+                        //     }/>
+                        // }/>
                     ]}/>
                 }/>
             );

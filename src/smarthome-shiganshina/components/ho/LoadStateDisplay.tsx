@@ -17,6 +17,12 @@ import styled from "styled-components";
 import {utilizeGlobalTheme} from "../../../logic/app/App";
 import {createMargin} from "../../../logic/style/Margin";
 import {Progressbar} from "../lo/Progressbar";
+import {VM} from "../../../logic/style/ObjectVisualMeaning";
+import {LoadState} from "../../api/LoadState";
+import {HourglassFullRounded, PlayArrowRounded, PunchClock} from "@mui/icons-material";
+import moment, {duration} from "moment";
+import {Ticker} from "../../../smarthome-carbon-core/components/Ticker";
+
 
 export type LoadStateDisplayProps = CP<{
     task: LoadTaskStateInfo,
@@ -37,9 +43,7 @@ export class LoadStateDisplay extends cc<LoadStateDisplayProps, unknown, {}>((i,
 
     return (
         <Container>
-            <HighlightPad width={px(38)} bleedingAnimation height={px(38)} color={Color.ofHex("#10C84F")} children={
-                <Icon icon={<PlayIcon/>} size={px(20)}/>
-            }/>
+            { i.a("icon") }
 
             <FlexRow fw align={Align.CENTER} gap={px(10)} elements={[
                 <Text
@@ -58,6 +62,8 @@ export class LoadStateDisplay extends cc<LoadStateDisplayProps, unknown, {}>((i,
                         />
                     ]}/>
                 }/>,
+
+                i.a("time"),
 
             ]}/>
 
@@ -90,4 +96,60 @@ export class LoadStateDisplay extends cc<LoadStateDisplayProps, unknown, {}>((i,
             ]}/>
         </Container>
     );
-}) {}
+}) {
+
+    init() {
+        super.init();
+        this.timeAssembly();
+        this.iconAssembly();
+    }
+
+    private timeAssembly() {
+        this.assembly.assembly("time", theme => {
+            const terminated = this.props.task.terminated ?? false;
+            const interval = terminated ? 30e3 : 1e3;
+            const text = terminated ? (
+                `Finished ${moment.unix(this.props.task.startUnixTime as number).fromNow()}`
+            ) : (
+                `${ duration(moment().diff(moment.unix(this.props.task.startUnixTime as number)), "milliseconds").seconds()} sec elapsed`
+            )
+
+            return (
+                <Ticker interval={interval} renderer={() => (
+                    <If condition={this.props.task.startUnixTime !== undefined} ifTrue={
+                        <AF elements={[
+                            <Dot/>,
+                            <Text
+                                fontSize={px(14)}
+                                type={TextType.displayDescription}
+                                text={text}
+                            />
+                        ]}/>
+                    }/>
+                )}/>
+            );
+        })
+    }
+
+    private iconAssembly() {
+        this.assembly.assembly("icon", theme => {
+            interface Options {
+                [key: string]: () => JSX.Element;
+            }
+            const options: Options = {
+                [LoadState.RUNNING]: () => (
+                    <HighlightPad width={px(38)} height={px(38)} color={Color.ofHex("#10C84F")} children={
+                        <Icon icon={<PlayIcon/>} size={px(20)}/>
+                    }/>
+                ),
+                [LoadState.WAITING]: () => (
+                    <HighlightPad width={px(38)} bleedingAnimation height={px(38)} color={Color.ofHex("#ffbd29")} children={
+                        <Icon icon={<HourglassFullRounded/>} size={px(20)}/>
+                    }/>
+                )
+            }
+            const key: string = this.props.task.state ?? LoadState.RUNNING;
+            return options[key]?.() ?? <></>
+        })
+    }
+}

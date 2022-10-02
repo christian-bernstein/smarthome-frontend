@@ -172,6 +172,8 @@ export class BernieComponent<RProps, RState, LState extends object, Implementati
     }
 
     public dialog(component: JSX.Element) {
+        console.log("opening dialog")
+
         this.openLocalDialog(() => component);
     }
 
