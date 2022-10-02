@@ -17,12 +17,10 @@ import styled from "styled-components";
 import {utilizeGlobalTheme} from "../../../logic/app/App";
 import {createMargin} from "../../../logic/style/Margin";
 import {Progressbar} from "../lo/Progressbar";
-import {VM} from "../../../logic/style/ObjectVisualMeaning";
 import {LoadState} from "../../api/LoadState";
 import {HourglassFullRounded, PlayArrowRounded, PunchClock} from "@mui/icons-material";
 import moment, {duration} from "moment";
 import {Ticker} from "../../../smarthome-carbon-core/components/Ticker";
-
 
 export type LoadStateDisplayProps = CP<{
     task: LoadTaskStateInfo,
@@ -128,7 +126,7 @@ export class LoadStateDisplay extends cc<LoadStateDisplayProps, unknown, {}>((i,
                     }/>
                 )}/>
             );
-        })
+        });
     }
 
     private iconAssembly() {
@@ -138,6 +136,7 @@ export class LoadStateDisplay extends cc<LoadStateDisplayProps, unknown, {}>((i,
             }
             const options: Options = {
                 [LoadState.RUNNING]: () => (
+                    // Color.ofHex("#10C84F")
                     <HighlightPad width={px(38)} height={px(38)} color={Color.ofHex("#10C84F")} children={
                         <Icon icon={<PlayIcon/>} size={px(20)}/>
                     }/>
@@ -150,6 +149,6 @@ export class LoadStateDisplay extends cc<LoadStateDisplayProps, unknown, {}>((i,
             }
             const key: string = this.props.task.state ?? LoadState.RUNNING;
             return options[key]?.() ?? <></>
-        })
+        });
     }
 }
