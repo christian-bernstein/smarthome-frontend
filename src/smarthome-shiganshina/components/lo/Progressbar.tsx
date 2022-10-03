@@ -21,10 +21,10 @@ export class Progressbar extends BC<ProgressbarProps, any, any> {
             borderRadius: 90,
             width: "100%",
             [`&.${linearProgressClasses.colorPrimary}`]: {
-                backgroundColor: "#D9D9D9",
+                backgroundColor: "#121212",
             },
             [`& .${linearProgressClasses.bar}`]: {
-                backgroundColor: "#10C84F",
+                background: "linear-gradient(270deg, #9AECA4 0%, rgba(255, 243, 135, 0) 100%)"
             }
         }));
 
@@ -39,7 +39,7 @@ export class Progressbar extends BC<ProgressbarProps, any, any> {
                         text={`${p.value}%`}
                         coloredText
                         bold
-                        type={TextType.displayText}
+                        type={TextType.secondaryDescription}
                         color={Color.ofHex("#000000")}
                         fontSize={px(14)}
                     />

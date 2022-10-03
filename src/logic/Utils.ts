@@ -1,3 +1,5 @@
+export const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
 export function getOr<T>(val: T | undefined, def: T) {
     if (val === undefined) {
         return def;

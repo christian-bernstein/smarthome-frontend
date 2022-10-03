@@ -1,6 +1,6 @@
 import {cc} from "../../../smarthome-carbon-core/api/ICarbonAPI";
 import {CP} from "../../../smarthome-carbon-core/api/CarbonProps";
-import {LoadTaskStateInfo} from "../../api/LoadTaskStateInfo";
+import {LoadTaskStateInfo} from "../../api/initialization/LoadTaskStateInfo";
 import {Flex} from "../../../components/lo/FlexBox";
 import {LoadStateDisplay} from "./LoadStateDisplay";
 import {px} from "../../../logic/style/DimensionalMeasured";

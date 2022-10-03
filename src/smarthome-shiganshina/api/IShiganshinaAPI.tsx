@@ -1,4 +1,4 @@
-import {LoadConfig} from "./LoadConfig";
+import {LoadConfig} from "./initialization/LoadConfig";
 import {ShiganshinaFactory} from "./ShiganshinaFactory";
 
 export interface IShiganshinaAPI {

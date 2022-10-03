@@ -9,19 +9,16 @@ import {AF} from "../components/logic/ArrayFragment";
 import {LoadStateGroupDisplay} from "./components/ho/LoadStateGroupDisplay";
 import {ShiganshinaAPI} from "./api/ShiganshinaAPI";
 import {Flex} from "../components/lo/FlexBox";
-import {Button} from "../components/lo/Button";
 import {Align} from "../logic/style/Align";
-import {LoadTaskStateInfo} from "./api/LoadTaskStateInfo";
-import {LiteGrid} from "../components/lo/LiteGrid";
+import {LoadTaskStateInfo} from "./api/initialization/LoadTaskStateInfo";
 import {ShiganshinaLogo} from "./components/lo/ShiganshinaLogo";
-import {percent} from "../logic/style/DimensionalMeasured";
 import {Justify} from "../logic/style/Justify";
 import React, {useEffect, useState} from "react";
 import {Collapse} from "@mui/material";
 import {TransitionGroup} from "react-transition-group";
 import {createMargin} from "../logic/style/Margin";
 import {IShiganshinaAPI, shiganshina} from "./api/IShiganshinaAPI";
-import {LoadStateDisplay} from "./components/ho/LoadStateDisplay";
+import {ShiganshinaLoaderV2} from "./components/ho/ShiganshinaLoader";
 
 type LoadDisplayProps = {
     onFinish?: () => void
@@ -53,27 +50,31 @@ class LoadDisplay extends carbonClass<LoadDisplayProps, any, { state?: LoadTaskS
 
     componentRender(p: unknown, s: unknown, l: { state?: LoadTaskStateInfo }, t: Themeable.Theme, a: Assembly): JSX.Element | undefined {
         return (
-            this.component(local => {
-                if (local.state.state === undefined) {
-                    return (
-                        <LoadStateGroupDisplay tasks={[{
-                            title: "Booting",
-                            description: ["Preparing Shiganshina-API loading routine"]
-                        }]}/>
-                    );
-                } else {
-                    const taskTree: Array<LoadTaskStateInfo> = [local.state.state];
-                    let curState = local.state.state;
-                    while (curState.subtask !== undefined) {
-                        taskTree.push(curState.subtask);
-                        curState = curState.subtask;
-                    }
+            <Flex fw style={{ position: "relative", height: "25vh" }} align={Align.CENTER} elements={[
+                <Flex style={{ position: "absolute" }} elements={[
+                    this.component(local => {
+                        if (local.state.state === undefined) {
+                            return (
+                                <LoadStateGroupDisplay tasks={[{
+                                    title: "Booting",
+                                    description: ["Preparing Shiganshina-API loading routine"]
+                                }]}/>
+                            );
+                        } else {
+                            const taskTree: Array<LoadTaskStateInfo> = [local.state.state];
+                            let curState = local.state.state;
+                            while (curState.subtask !== undefined) {
+                                taskTree.push(curState.subtask);
+                                curState = curState.subtask;
+                            }
 
-                    return (
-                        <LoadStateGroupDisplay tasks={taskTree}/>
-                    )
-                }
-            }, "data")
+                            return (
+                                <LoadStateGroupDisplay tasks={taskTree}/>
+                            )
+                        }
+                    }, "data")
+                ]}/>
+            ]}/>
         );
     }
 }
@@ -91,18 +92,29 @@ const Display: React.FC<DisplayProps> = props => {
 
     const elementRenderer: Map = {
         "logo": () => (
-            <Flex align={Align.CENTER} justifyContent={Justify.CENTER} elements={[
+            <Flex align={Align.CENTER} fw justifyContent={Justify.CENTER} elements={[
                 <ShiganshinaLogo raw/>
             ]}/>
         ),
         "progress": () => (
-            <Flex align={Align.CENTER} elements={[
-                <LoadDisplay onFinish={() => {
-                    setTimeout(() => {
-                        setElements(prevState => prevState.filter(elem => elem !== "progress"));
-                        props.onFinish?.();
-                    }, 2e3);
-                }}/>
+            <Flex align={Align.CENTER} fw elements={[
+                // <LoadDisplay onFinish={() => {
+                //     setTimeout(() => {
+                //         setElements(prevState => prevState.filter(elem => elem !== "progress"));
+                //         props.onFinish?.();
+                //     }, 2e3);
+                // }}/>
+
+                <Flex fw style={{ position: "relative", height: "25vh" }} align={Align.CENTER} elements={[
+                    <Flex style={{ position: "absolute" }} elements={[
+                        <ShiganshinaLoaderV2 onLoadComplete={() => {
+                            setTimeout(() => {
+                                setElements(prevState => prevState.filter(elem => elem !== "progress"));
+                                props.onFinish?.();
+                            }, 2e3);
+                        }}/>
+                    ]}/>
+                ]}/>
             ]}/>
         )
     }
@@ -112,7 +124,7 @@ const Display: React.FC<DisplayProps> = props => {
             setElements(prevState => (
                 [...prevState, "progress"]
             ))
-        }, 2e3);
+        }, 1e3);
     }, []);
 
     return (
@@ -158,7 +170,7 @@ export class ShiganshinaLauncher extends BernieComponent<any, any, any> {
                             <Display onFinish={() => {
                                 setTimeout(() => {
                                     this.closeLocalDialog();
-                                }, 2e3);
+                                }, 1e3);
                             }}/>
                         }/>
                     ]}/>

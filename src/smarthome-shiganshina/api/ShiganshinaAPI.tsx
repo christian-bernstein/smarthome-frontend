@@ -1,20 +1,17 @@
 import {IShiganshinaAPI} from "./IShiganshinaAPI";
-import {LoadConfig} from "./LoadConfig";
-import {LoadTask} from "./LoadTask";
-import {ILoadContext} from "./ILoadContext";
-import {LoadTaskStateInfo} from "./LoadTaskStateInfo";
-import {ConfirmationDialog} from "../../components/lo/ConfirmationDialog";
-import {ObjectVisualMeaning} from "../../logic/style/ObjectVisualMeaning";
-import {ConfirmationType} from "../../logic/ConfirmationConfig";
-import {BernieComponent} from "../../logic/BernieComponent";
-import {LoadState} from "./LoadState";
+import {LoadConfig} from "./initialization/LoadConfig";
+import {LoadTask} from "./initialization/LoadTask";
+import {ILoadContext} from "./initialization/ILoadContext";
+import {LoadTaskStateInfo} from "./initialization/LoadTaskStateInfo";
+import {LoadState} from "./initialization/LoadState";
 import moment from "moment";
+import {v4} from "uuid";
 
 export class ShiganshinaAPI implements IShiganshinaAPI {
 
     private loadLocked: boolean = false
 
-    load(config: LoadConfig) {
+    async load(config: LoadConfig) {
         if (this.loadLocked) {
             throw new Error("ShiganshinaAPI: Trying to load, but load-lock is active");
         } else {
@@ -26,9 +23,35 @@ export class ShiganshinaAPI implements IShiganshinaAPI {
         const tasks: Array<LoadTask> = [
             {
                 async run(ctx: ILoadContext) {
-                    const max = 50;
+                    ctx.update({
+                        id: v4(),
+                        title: "Test 123",
+                        description: ["Loading web application. Configuring state & do other tasks"],
+                        startUnixTime: moment().unix(),
+                        loadPercentage: 0
+                    });
+
+                    await sleep(1000);
 
                     ctx.update({
+                        id: v4(),
+                        title: "Test 1234",
+                        description: ["Loading web application. Configuring state & do other tasks"],
+                        startUnixTime: moment().unix(),
+                        loadPercentage: 0
+                    });
+
+                    await sleep(5000);
+
+                    ctx.terminate();
+                }
+            },
+            {
+                async run(ctx: ILoadContext) {
+                    const max = 100;
+
+                    ctx.update({
+                        id: v4(),
                         title: "Loading",
                         description: ["Loading web application. Configuring state & do other tasks"],
                         startUnixTime: moment().unix(),
@@ -37,7 +60,7 @@ export class ShiganshinaAPI implements IShiganshinaAPI {
                     });
 
                     for (let i = 0; i <= max; i++) {
-                        await sleep(500);
+                        await sleep(100);
 
                         ctx.update({
                             loadPercentage: Number(Number((i / max * 100)).toFixed(2)),
@@ -47,19 +70,22 @@ export class ShiganshinaAPI implements IShiganshinaAPI {
                             }
                         });
 
-                        if (i === 1) {
+                        if (i === 5) {
                             ctx.update({
                                 state: LoadState.WAITING,
+                                appendices: ["require user input"],
                                 subtask: {
+                                    id: v4(),
                                     title: "Downloading settings",
                                     description: ["Downloading settings from settings server"]
                                 }
                             });
 
-                            await sleep(5e3);
+                            await sleep(8e3);
 
                             ctx.update({
                                 state: LoadState.RUNNING,
+                                appendices: undefined,
                                 subtask: undefined
                             });
                         }
@@ -86,29 +112,44 @@ export class ShiganshinaAPI implements IShiganshinaAPI {
         }
 
         let stateCache: LoadTaskStateInfo | undefined = undefined;
-        tasks.forEach((task: LoadTask, index, array) => {
-            // TODO: Add optional delay between each operation -> React might combine updates!
 
-            // TODO: Wrap safely
-            task.run({
+        function update(tasks: Array<LoadTask>, index: number, discardPreviousData: boolean, newState: LoadTaskStateInfo) {
+            const prevStateShallowCache = { ...stateCache };
+            const mixin: LoadTaskStateInfo | undefined = discardPreviousData ? {} : stateCache;
+
+            stateCache = { ...mixin, ...newState };
+            if (prevStateShallowCache !== stateCache) {
+                onStateChanged(stateCache);
+            }
+
+            // Check if the current update terminates the loading process
+            if (index === tasks.length - 1 && newState.terminated) {
+                completeLoading();
+            }
+        }
+
+
+
+        for (let i = 0; i < tasks.length; i++) {
+            stateCache = undefined;
+            const task: LoadTask = tasks[i];
+
+            if (config.executionPause !== undefined) {
+                await sleep(config.executionPause);
+            }
+
+            await task.run({
                 api: this,
                 config: config,
-                update: (state: LoadTaskStateInfo, discardPreviousData: boolean = true) => {
-                    const prevStateShallowCache = { ...stateCache };
-                    stateCache = { ...stateCache, ...state };
-
-                    if (prevStateShallowCache !== stateCache) {
-                        onStateChanged(stateCache);
-                    }
-
-                    console.log("updated", stateCache);
-
-                    // Check if the current update terminates the loading
-                    if (index === array.length - 1 && state.terminated) {
-                        completeLoading();
-                    }
+                update: (state: LoadTaskStateInfo, discardPreviousData: boolean = false) => {
+                    update(tasks, i, discardPreviousData, state);
+                },
+                terminate: () => {
+                    update(tasks, i, false, {
+                        terminated: true
+                    });
                 }
-            })
-        });
+            });
+        }
     }
 }
