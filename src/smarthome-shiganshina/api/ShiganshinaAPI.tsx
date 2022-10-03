@@ -28,17 +28,12 @@ export class ShiganshinaAPI implements IShiganshinaAPI {
                         title: "Test 123",
                         description: ["Loading web application. Configuring state & do other tasks"],
                         startUnixTime: moment().unix(),
-                        loadPercentage: 0
                     });
 
                     await sleep(1000);
 
                     ctx.update({
-                        id: v4(),
-                        title: "Test 1234",
-                        description: ["Loading web application. Configuring state & do other tasks"],
-                        startUnixTime: moment().unix(),
-                        loadPercentage: 0
+                        description: ["Loading web application. Configuring state & do other tasks 123 456 789"],
                     });
 
                     await sleep(5000);
