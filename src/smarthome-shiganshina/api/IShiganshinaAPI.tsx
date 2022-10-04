@@ -9,6 +9,8 @@ export interface IShiganshinaAPI {
     registerLoadTask(task: LoadTask): IShiganshinaAPI;
 }
 
+
+
 export let api: IShiganshinaAPI | undefined = undefined;
 
 export const shiganshina: (factory?: ShiganshinaFactory) => IShiganshinaAPI = (factory) => {
