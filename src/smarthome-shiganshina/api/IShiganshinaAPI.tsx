@@ -1,10 +1,12 @@
 import {LoadConfig} from "./initialization/LoadConfig";
 import {ShiganshinaFactory} from "./ShiganshinaFactory";
+import {LoadTask} from "./initialization/LoadTask";
 
 export interface IShiganshinaAPI {
 
     load(config: LoadConfig): void
 
+    registerLoadTask(task: LoadTask): IShiganshinaAPI;
 }
 
 export let api: IShiganshinaAPI | undefined = undefined;
