@@ -2,14 +2,30 @@ import {CommunicationLayer} from "../../api/communication/CommunicationLayer";
 import {INetInterface} from "../../api/communication/INetInterface";
 import {ICommunicationEndpoint} from "../../api/communication/ICommunicationEndpoint";
 import {ICommunicationLayer} from "../../api/communication/ICommunicationLayer";
+import {ProtocolAmendmentInstruction} from "../../api/communication/ProtocolAmendmentInstruction";
+import {ILanguageUnifier} from "../../api/communication/ILanguageUnifier";
+import {DefaultLanguageUnifier} from "../../api/communication/DefaultLanguageUnifier";
 
 export class TestCommunication1 {
 
     constructor() {
         // Create layer & add new endpoint implementation
-        const cl: ICommunicationLayer = new CommunicationLayer().addEndpoints(new class implements ICommunicationEndpoint {
-            close(): void {}
-            id(): string { return "test-1" }
+        const cl: ICommunicationLayer = new CommunicationLayer().addEndpoints(<ICommunicationEndpoint> new class implements ICommunicationEndpoint {
+            activateProtocol(instruction: ProtocolAmendmentInstruction): Promise<ICommunicationEndpoint> {
+
+                return Promise.resolve(this);
+            }
+
+            languageUnifier(): ILanguageUnifier {
+                return new DefaultLanguageUnifier();
+            }
+            close(): void {
+            }
+
+            id(): string {
+                return "test-1"
+            }
+
             netInterface(): INetInterface {
                 return {
                     send(message: string) {
