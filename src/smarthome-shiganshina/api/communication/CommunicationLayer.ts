@@ -23,11 +23,15 @@ export class CommunicationLayer implements ICommunicationLayer {
         return this;
     }
 
-    endpointFromID(id: string): ICommunicationEndpoint {
-        return this.endpoints({
+    endpointFromID(id: string, action:((endpoint: ICommunicationEndpoint) => void) | void): ICommunicationEndpoint {
+        const ep = this.endpoints({
             test(obj: ICommunicationEndpoint): boolean {
                 return obj.id() === id;
             }
         })[0] ?? undefined;
+        if (action !== undefined) {
+            action(ep);
+        }
+        return ep;
     }
 }

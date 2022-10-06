@@ -27,6 +27,10 @@ export class TestCommunication1 {
 
         });
 
+        // cl.addEndpoints(new ShiganshinaGateCommunicationEndpoint(), { .. })
+
+        // cl.endpointFromID("test-1").setFilter(message => false);
+
         // cl.endpointFromID("test-1").transcoder().registerOnTranscodeComplete<PacketType>("packet-type-name", ctx => { .. })
     }
 }

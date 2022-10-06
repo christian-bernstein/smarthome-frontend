@@ -1,4 +1,5 @@
-export type Packet = {
-    master: string,
-    payload: string
+export type Packet<Implementation> = Implementation & {
+    id: string,
+    unixTimestamp: number,
+    headers: Map<string, string>
 }
