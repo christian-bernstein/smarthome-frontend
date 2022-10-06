@@ -1,7 +1,9 @@
 import {INetInterface} from "./INetInterface";
+import {ILanguageUnifier} from "./ILanguageUnifier";
 
 export interface ICommunicationEndpoint {
     id(): string,
     netInterface(): INetInterface,
-    close(): void
+    close(): void,
+    languageUnifier(): ILanguageUnifier
 }
